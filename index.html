@@ -1,0 +1,199 @@
+<html>
+    <head>
+        <title>JavaScript Test at Nagwa</title>
+        <style>
+            * { padding: 0; margin: 0; }
+            canvas { background: rgb(199, 195, 195); display: block; margin: 0 auto;
+                position: relative;
+                left: -255px;
+                top: -236px;
+            }
+
+            #initialV            {
+                background-color: rgb(188, 201, 187);
+                position: relative;
+                top: 402px;
+                right: -3px;
+                font-size: 25px;
+                border-radius: 10px;
+            }
+
+            #angle             {
+                background-color: rgb(188, 201, 187);
+                position: relative;
+                top: 402px;
+                right: -8px;
+                font-size: 25px;
+                border-radius: 10px;    
+            }
+
+            #LaunchingButton
+            {
+                background-color: rgb(94, 222, 226);
+                position: relative;
+                top: 404px;
+                right: -20px;
+                font-size: 30px;
+                border-radius: 10px;
+                
+            }
+
+            #ResetingButton{
+                background-color: rgb(68, 214, 214);
+                position: relative;
+                top: 404px;
+                right: -23px;
+                font-size: 30px;
+                border-radius: 10px;
+            }
+
+            table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                position: relative;
+                right: -1008px;
+                bottom: -9px;
+                background-color: rgb(230, 100, 230);
+            }
+
+            th, td {
+                padding: 5px;
+                text-align: left;
+                position: relative;
+                right: 0px;
+                bottom: 0px;
+            }
+            
+        </style>
+    </head>
+    <body>
+
+        <table style="width: 40;">
+            <tr>
+                <th>The Maximum height reached is</th>
+                <th>The Maximum distance reached on x axis is</th>
+            </tr>
+            <tr>
+                <td id="maxHeight" >Here you will see the max height</td>
+                <td id="maxRange" >Here you will see the max Range</td>
+            </tr>
+
+        </table>
+        
+        <input id="initialV" placeholder="Enter velocity">
+        <input id="angle" placeholder="Enter the angle">
+
+        <button id="LaunchingButton" >Launch</button>
+        <button id="ResetingButton" >Reset</button>
+
+        <canvas id="myCanvas"  width="1000" height="600" ></canvas>
+
+        <script>
+            let canvas=document.getElementById('myCanvas')
+            let ctx=canvas.getContext('2d')
+            
+            let backgroundImg=new Image();
+            
+            function bgImg(){
+                ctx.drawImage(backgroundImg,0,0,canvas.width,canvas.height);
+            }
+            
+            let fire=new Image()
+            
+            function drawFire(){
+                ctx.drawImage(fire,x,y,planeWidth,planeHeight-3);
+            }
+            
+            backgroundImg.onload=function(){
+                
+                console.log('Fire loaded')
+                drawProjectile();
+                
+            };
+
+            let image1=new Image();
+            image1.src='plane.png';
+            backgroundImg.src='nightSky.jpg';
+            fire.src='flame.png';
+            
+            const planeWidth=35;
+            const planeHeight=35;
+
+            let x=0;
+            let y=canvas.height-28;
+
+            let gravity=9.81;
+            let initialVelocity=+document.getElementById('initialV').value;
+            let angle=+document.getElementById('angle').value;
+            let radian=(Math.PI*angle)/180;
+
+            let vx=initialVelocity*Math.cos(radian);
+            let vy=initialVelocity*Math.sin(radian);
+            
+            let t=0;
+
+            function projectileRange(){
+                return Math.pow(initialVelocity,2)*Math.sin(2*radian)/gravity;
+            }
+            function ProjectileMaxHeight(){
+                return Math.pow(initialVelocity,2)*Math.pow(Math.sin(radian),2)/(2*gravity);
+            }
+
+            let interval;
+
+            function settingTheInterval(){
+                interval=setInterval(drawProjectile,10);
+            }
+
+            document.getElementById('LaunchingButton').addEventListener('click',settingTheInterval);
+
+            let maxNumber=-1;
+            
+            function drawProjectile(){
+                
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                
+                initialVelocity=+document.getElementById('initialV').value;
+                angle=+document.getElementById('angle').value;
+                radian=(Math.PI*angle)/180;
+                vy=initialVelocity*Math.sin(radian);
+
+                console.log("Hello Hello");
+
+                bgImg();
+                ctx.drawImage(image1,x,y,planeWidth,planeHeight);
+
+                if (t!==0){
+                    x=initialVelocity*Math.cos(radian)*(t/1000);
+                    y=canvas.height-planeHeight-(vy*(t/1000)-gravity*Math.pow((t/1000),2)/2);
+                                        
+                    document.getElementById('maxRange').innerText=Math.round(x);
+                    
+                    if ((vy*(t/1000)-gravity*Math.pow((t/1000),2)/2)>maxNumber){
+                        maxNumber=(vy*(t/1000)-gravity*Math.pow((t/1000),2)/2);
+                        document.getElementById('maxHeight').innerText=Math.round(maxNumber);
+                    
+                    }
+                    if (x>canvas.width-28 || y>canvas.height-28){
+                                                
+                        clearInterval(interval);
+                        drawFire();
+                        
+                        
+                    }                   
+                }
+    
+                t+=10;
+            }
+
+            document.getElementById('ResetingButton').addEventListener('click',reseting);
+            function reseting(){
+                alert("Projectile has been reseted");
+                document.location.reload();
+                
+
+            }
+
+        </script>
+    </body>
+</html>
