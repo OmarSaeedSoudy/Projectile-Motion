@@ -139,7 +139,24 @@
             function settingTheInterval(){
                 interval=setInterval(drawProjectile,10);
             }
+            
 
+            document.addEventListener("keydown",theEnterButton);
+            function theEnterButton(e){
+                if(e.keyCode=="13")
+                    if (isNaN(initialVelocity)){
+                        alert("Not a viald input in the initial velocity (add a number not a letter)")
+                        reseting();
+                    }
+                    else if (isNaN(angleInDegree)){
+                        alert("Not a viald input in the angle (add a number not a letter)")
+                        reseting();
+                    }
+                    else
+                        settingTheInterval();
+            }
+
+            
             document.getElementById('LaunchingButton').addEventListener('click',settingTheInterval);
 
             let maxNumber=-1;
