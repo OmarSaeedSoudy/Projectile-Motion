@@ -93,29 +93,24 @@
             let ctx=canvas.getContext('2d')
             
             let backgroundImg=new Image();
+            let planeImage=new Image();
+            let fireImage=new Image();
+
+            planeImage.src='plane.png';
+            backgroundImg.src='nightSky.jpg';
+            fireImage.src='flame.png';
             
-            function bgImg(){
+            function callingBackgroundImage(){
                 ctx.drawImage(backgroundImg,0,0,canvas.width,canvas.height);
             }
-            
-            let fire=new Image()
-            
             function drawFire(){
-                ctx.drawImage(fire,x,y,planeWidth,planeHeight-3);
+                ctx.drawImage(fireImage,x,y,planeWidth,planeHeight-3);
             }
             
-            backgroundImg.onload=function(){
-                
-                console.log('Fire loaded')
+            window.onload=function(){
                 drawProjectile();
-                
-            };
+            }
 
-            let image1=new Image();
-            image1.src='plane.png';
-            backgroundImg.src='nightSky.jpg';
-            fire.src='flame.png';
-            
             const planeWidth=35;
             const planeHeight=35;
 
@@ -124,19 +119,19 @@
 
             let gravity=9.81;
             let initialVelocity=+document.getElementById('initialV').value;
-            let angle=+document.getElementById('angle').value;
-            let radian=(Math.PI*angle)/180;
+            let angleInDegree=+document.getElementById('angle').value;
+            let angleInRadian=(Math.PI*angleInDegree)/180;
 
-            let vx=initialVelocity*Math.cos(radian);
-            let vy=initialVelocity*Math.sin(radian);
+            let vx=initialVelocity*Math.cos(angleInRadian);
+            let vy=initialVelocity*Math.sin(angleInRadian);
             
-            let t=0;
+            let time=0;
 
-            function projectileRange(){
-                return Math.pow(initialVelocity,2)*Math.sin(2*radian)/gravity;
+            function calculatingProjectileRange(){
+                return Math.pow(initialVelocity,2)*Math.sin(2*angleInRadian)/gravity;
             }
-            function ProjectileMaxHeight(){
-                return Math.pow(initialVelocity,2)*Math.pow(Math.sin(radian),2)/(2*gravity);
+            function calculatingProjectileMaxHeight(){
+                return Math.pow(initialVelocity,2)*Math.pow(Math.sin(angleInRadian),2)/(2*gravity);
             }
 
             let interval;
@@ -154,44 +149,36 @@
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 
                 initialVelocity=+document.getElementById('initialV').value;
-                angle=+document.getElementById('angle').value;
-                radian=(Math.PI*angle)/180;
-                vy=initialVelocity*Math.sin(radian);
+                angleInDegree=+document.getElementById('angle').value;
+                angleInRadian=(Math.PI*angleInDegree)/180;
+                vy=initialVelocity*Math.sin(angleInRadian);
 
-                console.log("Hello Hello");
+                callingBackgroundImage();
+                ctx.drawImage(planeImage,x,y,planeWidth,planeHeight);
 
-                bgImg();
-                ctx.drawImage(image1,x,y,planeWidth,planeHeight);
-
-                if (t!==0){
-                    x=initialVelocity*Math.cos(radian)*(t/1000);
-                    y=canvas.height-planeHeight-(vy*(t/1000)-gravity*Math.pow((t/1000),2)/2);
-                                        
-                    document.getElementById('maxRange').innerText=Math.round(x);
-                    
-                    if ((vy*(t/1000)-gravity*Math.pow((t/1000),2)/2)>maxNumber){
-                        maxNumber=(vy*(t/1000)-gravity*Math.pow((t/1000),2)/2);
-                        document.getElementById('maxHeight').innerText=Math.round(maxNumber);
-                    
-                    }
-                    if (x>canvas.width-28 || y>canvas.height-28){
-                                                
-                        clearInterval(interval);
-                        drawFire();
-                        
-                        
-                    }                   
+                if (time!==0){
+                    x=initialVelocity*Math.cos(angleInRadian)*(time/1000);
+                    y=canvas.height-planeHeight-(vy*(time/1000)-gravity*Math.pow((time/1000),2)/2);                  
                 }
-    
-                t+=10;
+                time+=10;
+                
+                document.getElementById('maxRange').innerText=Math.round(x);
+                    
+                if ((vy*(time/1000)-gravity*Math.pow((time/1000),2)/2)>maxNumber){
+                    maxNumber=(vy*(time/1000)-gravity*Math.pow((time/1000),2)/2);
+                    document.getElementById('maxHeight').innerText=Math.round(maxNumber);
+                    
+                }
+                if (x>canvas.width-28 || y>canvas.height-28){                              
+                    clearInterval(interval);
+                    drawFire();       
+                } 
             }
 
             document.getElementById('ResetingButton').addEventListener('click',reseting);
             function reseting(){
                 alert("Projectile has been reseted");
                 document.location.reload();
-                
-
             }
 
         </script>
