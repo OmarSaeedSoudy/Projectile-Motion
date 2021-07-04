@@ -4,9 +4,9 @@
         <style>
             * { padding: 0; margin: 0; }
             canvas { background: rgb(199, 195, 195); display: block; margin: 0 auto;
-                position: relative;
-                left: -255px;
-                top: -236px;
+                position: absolute;
+                left: 2px;
+                top: 22px;
             }
 
             #initialV            {
@@ -30,9 +30,9 @@
             #LaunchingButton
             {
                 background-color: rgb(94, 222, 226);
-                position: relative;
-                top: 404px;
-                right: -20px;
+                position: absolute;
+                top: 641px;
+                left: 432px;
                 font-size: 30px;
                 border-radius: 10px;
                 
@@ -40,49 +40,49 @@
 
             #ResetingButton{
                 background-color: rgb(68, 214, 214);
-                position: relative;
-                top: 404px;
-                right: -23px;
+                position: absolute;
+                top: 641px;
+                left: 550px;
                 font-size: 30px;
                 border-radius: 10px;
             }
 
-            table, th, td {
-                border: 1px solid black;
-                border-collapse: collapse;
-                position: relative;
-                right: -1008px;
-                bottom: -9px;
-                background-color: rgb(230, 100, 230);
+            #initialV{
+                position: absolute;
+                top: 645px;
+                left: 20px;
+                border-radius: 5px;
+                
             }
 
-            th, td {
-                padding: 5px;
-                text-align: left;
-                position: relative;
-                right: 0px;
-                bottom: 0px;
+            #velocityLabel{
+                position: absolute;
+                top: 660px;
+                left: 8px;
+
             }
-            
+            #angleLabel{
+                position: absolute;
+                top: 660px;
+                left: 258px;
+            }
+            #angle{
+                position: absolute;
+                top: 645px;
+                left: 250px;
+                border-radius: 5px;
+            }
+
         </style>
     </head>
     <body>
 
-        <table style="width: 40;">
-            <tr>
-                <th>The Maximum height reached is</th>
-                <th>The Maximum distance reached on x axis is</th>
-            </tr>
-            <tr>
-                <td id="maxHeight" >Here you will see the max height</td>
-                <td id="maxRange" >Here you will see the max Range</td>
-            </tr>
+        <input type="range" min="1" max="90" value="45" name=""  id="initialV">
+        <p id="velocityLabel">Value of initial velocity: <span id="value1" > </span></p>
 
-        </table>
+        <input type="range" min="5" max="90" value="45" id="angle">
+        <p id="angleLabel">Value of angle: <span id="value2" > </span></p>
         
-        <input id="initialV" placeholder="Enter velocity">
-        <input id="angle" placeholder="Enter the angle">
-
         <button id="LaunchingButton" >Launch</button>
         <button id="ResetingButton" >Reset</button>
 
@@ -92,6 +92,19 @@
             let canvas=document.getElementById('myCanvas')
             let ctx=canvas.getContext('2d')
             
+            let velocitySlider=document.getElementById("initialV");
+            let angleSlider=document.getElementById("angle");
+            let output1=document.getElementById("value1");
+            let output2=document.getElementById("value2");
+            output1.innerHTML=velocitySlider.value;
+            velocitySlider.oninput=function(){
+                output1.innerHTML=this.value;
+            }
+            output2.innerHTML=angleSlider.value;
+            angleSlider.oninput=function(){
+                output2.innerHTML=this.value;
+            }
+
             let backgroundImg=new Image();
             let planeImage=new Image();
             let fireImage=new Image();
@@ -115,7 +128,7 @@
             const planeHeight=35;
 
             let x=0;
-            let y=canvas.height-28;
+            let y=canvas.height-38;
 
             let gravity=9.81;
             let initialVelocity=+document.getElementById('initialV').value;
@@ -144,22 +157,15 @@
             document.addEventListener("keydown",theEnterButton);
             function theEnterButton(e){
                 if(e.keyCode=="13")
-                    if (isNaN(initialVelocity)){
-                        alert("Not a viald input in the initial velocity (add a number not a letter)")
-                        reseting();
-                    }
-                    else if (isNaN(angleInDegree)){
-                        alert("Not a viald input in the angle (add a number not a letter)")
-                        reseting();
-                    }
-                    else
-                        settingTheInterval();
+                    settingTheInterval();
             }
 
             
             document.getElementById('LaunchingButton').addEventListener('click',settingTheInterval);
 
-            let maxNumber=-1;
+            let maxHeightReached=0;
+            let lineAtY=0;
+            let outputOfHeight=0;
             
             function drawProjectile(){
                 
@@ -171,33 +177,64 @@
                 vy=initialVelocity*Math.sin(angleInRadian);
 
                 callingBackgroundImage();
-                ctx.drawImage(planeImage,x,y,planeWidth,planeHeight);
+                ctx.drawImage(planeImage,x+10,y,planeWidth,planeHeight);
 
                 if (time!==0){
                     x=initialVelocity*Math.cos(angleInRadian)*(time/1000);
                     y=canvas.height-planeHeight-(vy*(time/1000)-gravity*Math.pow((time/1000),2)/2);                  
                 }
                 time+=10;
-                
-                document.getElementById('maxRange').innerText=Math.round(x);
                     
-                if ((vy*(time/1000)-gravity*Math.pow((time/1000),2)/2)>maxNumber){
-                    maxNumber=(vy*(time/1000)-gravity*Math.pow((time/1000),2)/2);
-                    document.getElementById('maxHeight').innerText=Math.round(maxNumber);
-                    
+                if ((vy*(time/1000)-gravity*Math.pow((time/1000),2)/2)>maxHeightReached){
+                    maxHeightReached=(vy*(time/1000)-gravity*Math.pow((time/1000),2)/2);  
+                    lineAtY=y;
+                    outputOfHeight=maxHeightReached;                  
                 }
                 if (x>canvas.width-28 || y>canvas.height-28){                              
                     clearInterval(interval);
                     drawFire();       
                 } 
+                ctx.beginPath();
+                ctx.lineCap='round';
+                ctx.strokeStyle='white';
+                ctx.moveTo(0,canvas.height);
+                ctx.lineTo(x,canvas.height);
+                ctx.lineWidth=10;
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.lineCap='round';
+                ctx.strokeStyle='white';
+                ctx.moveTo(0,canvas.height);
+                ctx.lineTo(0,lineAtY+28);
+                ctx.lineWidth=10;
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.font='15px Arial';
+                ctx.fillStyle="white";
+                ctx.fillText(Math.round(outputOfHeight),0,lineAtY);
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.font='15px Arial';
+                ctx.fillStyle="white";
+                ctx.fillText(Math.round(x),x+50,canvas.height);
+                ctx.closePath();
             }
 
             document.getElementById('ResetingButton').addEventListener('click',reseting);
             function reseting(){
-                alert("Projectile has been reseted");
-                document.location.reload();
+                clearInterval(interval);
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                time=0;
+                x=0;
+                y=canvas.height-38;
+                maxHeightReached=0;
+                drawProjectile();   
             }
-
         </script>
     </body>
 </html>
